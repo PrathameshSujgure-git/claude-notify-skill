@@ -7,7 +7,7 @@ Get macOS notifications when Claude Code finishes tasks, needs input, or request
 - **Task Completion** - Get notified with the actual response text when Claude finishes
 - **Permission Requests** - Know when Claude needs approval for file edits, commands, etc.
 - **Input Needed** - Alert when Claude asks a question or needs your input
-- **Click to Focus** - Clicking the notification brings Terminal to the foreground
+- **Click to Focus** - Clicking the notification brings your terminal app to the foreground (auto-detects Terminal, Cursor, VS Code, iTerm, etc.)
 - **Customizable Sounds** - Choose from Pop, Glass, Ping, Funk, Basso, and more
 
 ## Requirements
@@ -50,7 +50,7 @@ Add this to your `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); transcript=$(echo \"$input\" | jq -r '.transcript_path'); msg=$(tail -20 \"$transcript\" | grep '\"type\":\"assistant\"' | tail -1 | jq -r '.message.content[] | select(.type==\"text\") | .text' 2>/dev/null | head -c 200); [ -z \"$msg\" ] && msg='Task finished'; terminal-notifier -title 'Claude Code' -message \"$msg\" -sound Pop -activate com.apple.Terminal"
+            "command": "input=$(cat); transcript=$(echo \"$input\" | jq -r '.transcript_path'); msg=$(tail -20 \"$transcript\" | grep '\"type\":\"assistant\"' | tail -1 | jq -r '.message.content[] | select(.type==\"text\") | .text' 2>/dev/null | head -c 200); [ -z \"$msg\" ] && msg='Task finished'; terminal-notifier -title 'Claude Code' -message \"$msg\" -sound Pop -activate \"${__CFBundleIdentifier:-com.apple.Terminal}\""
           }
         ]
       }
@@ -61,7 +61,7 @@ Add this to your `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Needs your input' -sound Ping -activate com.apple.Terminal"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Needs your input' -sound Ping -activate \"${__CFBundleIdentifier:-com.apple.Terminal}\""
           }
         ]
       }
@@ -72,7 +72,7 @@ Add this to your `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "terminal-notifier -title 'Claude Code' -message 'Permission needed' -sound Ping -activate com.apple.Terminal"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Permission needed' -sound Ping -activate \"${__CFBundleIdentifier:-com.apple.Terminal}\""
           }
         ]
       }
@@ -114,7 +114,9 @@ Use `/notify:sound` or manually edit the `-sound` parameter:
 
 ### Change Terminal App
 
-Update the `-activate` parameter in the hooks:
+The notification automatically opens the app where Claude is running (using `$__CFBundleIdentifier`).
+
+To override, replace `"${__CFBundleIdentifier:-com.apple.Terminal}"` with a specific bundle ID:
 
 | Terminal | Bundle ID |
 |----------|-----------|
@@ -122,6 +124,7 @@ Update the `-activate` parameter in the hooks:
 | iTerm2 | `com.googlecode.iterm2` |
 | Warp | `dev.warp.Warp-Stable` |
 | VS Code | `com.microsoft.VSCode` |
+| Cursor | `com.todesktop.230313mzl4w4u92` |
 | Kitty | `net.kovidgoyal.kitty` |
 
 ## Hook Events
