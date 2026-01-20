@@ -2,32 +2,52 @@
 
 Get macOS notifications when Claude Code finishes tasks, needs input, or requests permissions.
 
-![Demo](./demo.gif)
-
 ## Features
 
 - **Task Completion** - Get notified with the actual response text when Claude finishes
 - **Permission Requests** - Know when Claude needs approval for file edits, commands, etc.
 - **Input Needed** - Alert when Claude asks a question or needs your input
 - **Click to Focus** - Clicking the notification brings Terminal to the foreground
-- **Customizable Sounds** - Choose from Pop, Glass, Ping, Funk, or Basso
+- **Customizable Sounds** - Choose from Pop, Glass, Ping, Funk, Basso, and more
 
 ## Requirements
 
 - macOS (see [Windows/Linux alternatives](#windowslinux-alternatives) below)
-- [Claude Code CLI](https://claude.ai/download)
-- `terminal-notifier` - Install via Homebrew:
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
+- `terminal-notifier` and `jq`:
   ```bash
-  brew install terminal-notifier
-  ```
-- `jq` - Install via Homebrew:
-  ```bash
-  brew install jq
+  brew install terminal-notifier jq
   ```
 
 ## Installation
 
-### Option 1: Quick Setup (Copy & Paste)
+### Option 1: As a Claude Code Plugin (Recommended)
+
+Add to your `~/.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "notify-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "PrathameshSujgure-git/claude-notify-skill"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "notify@notify-plugins": true
+  }
+}
+```
+
+Restart Claude Code, then use:
+- `/notify:on` - Enable notifications
+- `/notify:off` - Disable notifications
+- `/notify:sound` - Change sound
+- `/notify:status` - Check settings
+
+### Option 2: Manual Setup (Copy & Paste)
 
 Add this to your `~/.claude/settings.json`:
 
@@ -71,9 +91,14 @@ Add this to your `~/.claude/settings.json`:
 }
 ```
 
-### Option 2: Merge with Existing Settings
+## Commands
 
-If you already have a `settings.json`, merge the `hooks` object with your existing configuration.
+| Command | Description |
+|---------|-------------|
+| `/notify:on` | Enable notifications |
+| `/notify:off` | Disable notifications |
+| `/notify:sound` | Change notification sound |
+| `/notify:status` | Show current settings |
 
 ## Configuration
 
@@ -87,25 +112,19 @@ To see the response text in notifications:
 
 ### Change Notification Sound
 
-Edit the `-sound` parameter in the hook commands. Available sounds:
-- `Pop` (default)
-- `Glass`
-- `Ping`
-- `Funk`
-- `Basso`
-- `Blow`
-- `Bottle`
-- `Frog`
-- `Hero`
-- `Morse`
-- `Purr`
-- `Sosumi`
-- `Submarine`
-- `Tink`
+Use `/notify:sound` or manually edit the `-sound` parameter:
+
+| Sound | Description |
+|-------|-------------|
+| Pop | Short, subtle (default) |
+| Glass | Clear glass tap |
+| Ping | Soft ping |
+| Funk | Funky alert |
+| Basso | Deep bass note |
 
 ### Change Terminal App
 
-If you use a different terminal (iTerm2, Warp, etc.), update the `-activate` parameter:
+Update the `-activate` parameter in the hooks:
 
 | Terminal | Bundle ID |
 |----------|-----------|
@@ -114,31 +133,24 @@ If you use a different terminal (iTerm2, Warp, etc.), update the `-activate` par
 | Warp | `dev.warp.Warp-Stable` |
 | VS Code | `com.microsoft.VSCode` |
 | Kitty | `net.kovidgoyal.kitty` |
-| Alacritty | `org.alacritty` |
 
-## Hook Events Explained
+## Hook Events
 
-| Event | When it Fires | Default Message |
-|-------|---------------|-----------------|
-| `Stop` | Claude finishes responding | Last response text |
-| `Notification` | Claude needs general input | "Needs your input" |
-| `PermissionRequest` | Claude asks for permission (edit file, run command) | "Permission needed" |
+| Event | When | Default Message |
+|-------|------|-----------------|
+| `Stop` | Claude finishes responding | Actual response text |
+| `Notification` | Claude needs input | "Needs your input" |
+| `PermissionRequest` | Claude asks permission | "Permission needed" |
 
 ## Windows/Linux Alternatives
-
-This skill uses `terminal-notifier` which is macOS only. For other platforms:
 
 ### Windows (PowerShell + BurntToast)
 
 ```powershell
-# Install BurntToast
 Install-Module -Name BurntToast
-
-# Notification command
-New-BurntToastNotification -Text "Claude Code", "Task finished"
 ```
 
-Replace the `command` in hooks with:
+Replace hook command with:
 ```json
 "command": "powershell -Command \"New-BurntToastNotification -Text 'Claude Code', 'Task finished'\""
 ```
@@ -146,14 +158,10 @@ Replace the `command` in hooks with:
 ### Linux (notify-send)
 
 ```bash
-# Install libnotify
 sudo apt install libnotify-bin
-
-# Notification command
-notify-send "Claude Code" "Task finished"
 ```
 
-Replace the `command` in hooks with:
+Replace hook command with:
 ```json
 "command": "notify-send 'Claude Code' 'Task finished'"
 ```
@@ -161,36 +169,15 @@ Replace the `command` in hooks with:
 ## Troubleshooting
 
 ### Notifications not appearing
+1. Check installation: `which terminal-notifier`
+2. Test: `terminal-notifier -title "Test" -message "Hello"`
+3. Check System Settings → Notifications
 
-1. Check if `terminal-notifier` is installed: `which terminal-notifier`
-2. Test manually: `terminal-notifier -title "Test" -message "Hello"`
-3. Check notification permissions in System Settings
+### No preview text
+Enable previews: System Settings → Notifications → terminal-notifier → Show Previews → Always
 
-### No preview text showing
-
-1. Enable previews: System Settings → Notifications → terminal-notifier → Show Previews → Always
-2. Check if `jq` is installed: `which jq`
-
-### Changes not taking effect
-
-Restart Claude Code after modifying `settings.json`.
-
-## Quick Commands (for CLAUDE.md)
-
-Add these to your `~/.claude/CLAUDE.md` to control notifications via natural language:
-
-```markdown
-## Notification Commands
-
-When user says "notify on/off/sound/status":
-
-| Command | Action |
-|---------|--------|
-| `notify on` | Enable notifications |
-| `notify off` | Disable notifications |
-| `notify sound` | Change sound (show picker) |
-| `notify status` | Show current settings |
-```
+### Changes not working
+Restart Claude Code after modifying settings.
 
 ## License
 
@@ -198,4 +185,4 @@ MIT
 
 ## Credits
 
-Built with [Claude Code](https://claude.ai/download) by Anthropic.
+Built with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) by Anthropic.

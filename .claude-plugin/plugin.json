@@ -1,0 +1,10 @@
+{
+  "name": "notify",
+  "description": "macOS notifications for Claude Code - get alerted when tasks complete, input is needed, or permissions are requested",
+  "version": "1.0.0",
+  "author": {
+    "name": "PrathameshSujgure"
+  },
+  "keywords": ["notifications", "macos", "alerts", "terminal-notifier"],
+  "license": "MIT"
+}
