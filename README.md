@@ -21,31 +21,21 @@ Get macOS notifications when Claude Code finishes tasks, needs input, or request
 
 ## Installation
 
-### Option 1: As a Claude Code Plugin (Recommended)
+### Option 1: Via Claude Code Commands (Recommended)
 
-Add to your `~/.claude/settings.json`:
+1. Add the marketplace:
+   ```
+   /plugin marketplace add PrathameshSujgure-git/claude-notify-skill
+   ```
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "notify-plugins": {
-      "source": {
-        "source": "github",
-        "repo": "PrathameshSujgure-git/claude-notify-skill"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "notify@notify-plugins": true
-  }
-}
-```
+2. Install the plugin:
+   ```
+   /plugin install notify@notify-plugins
+   ```
 
-Restart Claude Code, then use:
-- `/notify:on` - Enable notifications
-- `/notify:off` - Disable notifications
-- `/notify:sound` - Change sound
-- `/notify:status` - Check settings
+3. Restart Claude Code
+
+4. Use `/notify:on` to enable notifications
 
 ### Option 2: Manual Setup (Copy & Paste)
 
